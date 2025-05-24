@@ -1,0 +1,66 @@
+// Parser.cup
+terminal IF, ELSE, WHILE, PRINT, INPUT, INT_TYPE, FLOAT_TYPE, STRING_TYPE, BOOL_TYPE;
+terminal FUNCTION, RETURN, COMMA, SEMICOLON, LPAREN, RPAREN, LBRACE, RBRACE;
+terminal PLUS, MINUS, MUL, DIV, MOD, ASSIGN, EQ, NEQ, LT, GT, LEQ, GEQ, AND, OR, NOT;
+terminal Integer INT_LIT;
+terminal Float FLOAT_LIT;
+terminal String STRING_LIT, ID;
+terminal Boolean BOOL_LIT;
+
+non terminal Program;
+non terminal StatementList;
+non terminal Statement;
+non terminal Expression;
+non terminal Type;
+non terminal FunctionDecl;
+
+// Precedencia de operadores
+precedence left OR;
+precedence left AND;
+precedence left EQ, NEQ;
+precedence left LT, GT, LEQ, GEQ;
+precedence left PLUS, MINUS;
+precedence left MUL, DIV, MOD;
+precedence right NOT;
+
+// Gramática
+Program ::= StatementList | FunctionDecl Program;
+
+StatementList ::= Statement SEMICOLON | StatementList Statement SEMICOLON;
+
+Statement ::= 
+      Type ID ASSIGN Expression                     # VarDecl
+    | ID ASSIGN Expression                          # Assignment
+    | PRINT LPAREN Expression RPAREN                # PrintStmt
+    | INPUT LPAREN ID RPAREN                        # InputStmt
+    | IF LPAREN Expression RPAREN LBRACE StatementList RBRACE ELSE LBRACE StatementList RBRACE  # IfStmt
+    | WHILE LPAREN Expression RPAREN LBRACE StatementList RBRACE                            # WhileStmt
+;
+
+Expression ::= 
+      Expression PLUS Expression                    # Add
+    | Expression MINUS Expression                  # Sub
+    | Expression MUL Expression                    # Mul
+    | Expression DIV Expression                    # Div
+    | Expression MOD Expression                    # Mod
+    | Expression EQ Expression                     # Equal
+    | Expression NEQ Expression                    # NotEqual
+    | Expression LT Expression                     # LessThan
+    | Expression GT Expression                     # GreaterThan
+    | Expression LEQ Expression                    # LessEqual
+    | Expression GEQ Expression                    # GreaterEqual
+    | Expression AND Expression                    # And
+    | Expression OR Expression                     # Or
+    | NOT Expression                               # Not
+    | LPAREN Expression RPAREN                     # ParenExpr
+    | ID                                           # Var
+    | INT_LIT                                      # IntLit
+    | FLOAT_LIT                                    # FloatLit
+    | STRING_LIT                                   # StringLit
+    | BOOL_LIT                                     # BoolLit
+;
+
+Type ::= INT_TYPE | FLOAT_TYPE | STRING_TYPE | BOOL_TYPE;
+
+FunctionDecl ::= FUNCTION ID LPAREN ParamList RPAREN LBRACE StatementList RETURN Expression SEMICOLON RBRACE;
+ParamList ::= Type ID | ParamList COMMA Type ID;
